@@ -144,8 +144,8 @@ class Product_Of_The_Day_Public {
 
 	public function track_page_click($content){
 		global $wpdb;
+		$main_post = get_post(get_the_ID());
 		if(get_post_type() == 'product_of_the_day'){
-
 			if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
 				$ip = $_SERVER['HTTP_CLIENT_IP'];
 			} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
@@ -154,6 +154,7 @@ class Product_Of_The_Day_Public {
 				$ip = $_SERVER['REMOTE_ADDR'];
 			}
 
+
 			$post_id = get_post()->ID;
 			$table_name = $wpdb->prefix . 'call_to_action_clicks';
 
@@ -161,11 +162,9 @@ class Product_Of_The_Day_Public {
 					'ip_address' => $ip, 
 					'product_post_id' => $post_id
 				],
-            	['%s', '%i'] 
-       		);
+				['%s', '%s'] 
+			);
 		}
-
-		return $content;
 	}
 
 
