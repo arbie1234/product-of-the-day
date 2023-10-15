@@ -106,6 +106,9 @@ class Product_Of_The_Day_Public {
 	 *
 	 */
 	public function product_of_the_day(){
+		ob_start();
+		$product_of_the_day_settings       = maybe_unserialize( get_option( 'product_of_the_day_settings', array() ) );
+		$block_title = ( ! empty( $product_of_the_day_settings ) && isset( $product_of_the_day_settings['block_title'] ) ) ? $product_of_the_day_settings['block_title'] : 'Product of the day';
 
 		$args = array(
 			'post_type' => 'product_of_the_day',
@@ -121,11 +124,14 @@ class Product_Of_The_Day_Public {
 			'posts_per_page' => '1',
 		);
 
+		$content = '';
 		$products_of_the_day = new WP_Query($args);
 		if ($products_of_the_day->have_posts()) {
 			while ($products_of_the_day->have_posts()) {
 				$products_of_the_day->the_post();
 				?>
+				<div>
+					<div style="text-align:center;font-size:20px;font-weight:600"><?= $block_title ?></div>
 					<div style="max-width: 200px; margin: auto; padding: 10px; border: 1px solid #c7c7c7; border-radius: 5px; box-shadow: 1px 1px 9px 0px #b1b1b1;">
 						<div style=" text-align: center; margin-bottom: 5px; font-size: 20px; font-weight: 500; "><?= the_title() ?></div>
 						<div>
@@ -136,13 +142,17 @@ class Product_Of_The_Day_Public {
 							<a style="text-align: center; text-transform: uppercase; background: #6dc371; padding: 5px; color: white; width: 100%; display: block; font-weight: 600; border-radius: 4px;" href="<?= get_permalink() ?>">Go to product</a>
 						</div>
 					</div>
+				</div>
 				<?php
 			}
 		}
+		wp_reset_postdata();
+        $content = ob_get_clean(); // store buffered output content.
+    	return $content; // Return the content.
 	}
 
 
-	public function track_page_click($content){
+	public function track_page_click(){
 		global $wpdb;
 		$main_post = get_post(get_the_ID());
 		if(get_post_type() == 'product_of_the_day'){
